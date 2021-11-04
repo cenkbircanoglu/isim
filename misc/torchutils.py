@@ -32,9 +32,16 @@ class PolyOptimizer(torch.optim.SGD):
 
             for i in range(len(self.param_groups)):
                 self.param_groups[i]["lr"] = self.__initial_lr[i] * lr_mult
-                log_loss_summary(
-                    self.logger, self.param_groups[i]["lr"], epoch, tag=f"lr-group-{i}"
-                )
+                if self.logger is not None:
+                    log_loss_summary(
+                        self.logger,
+                        self.param_groups[i]["lr"],
+                        epoch,
+                        tag=f"lr-group-{i}",
+                    )
+        # else:
+        #     for i in range(len(self.param_groups)):
+        #         self.param_groups[i]["lr"] = 1e-4
         super().step(closure)
 
         self.global_step += 1
@@ -47,14 +54,14 @@ def split_dataset(dataset, n_splits):
 
 
 if __name__ == "__main__":
-    max_step = (10510 // 16) * 20
+    max_step = (10510 // 16) * 3
 
     optimizer = PolyOptimizer(
         [{"params": dict(), "lr": 0.1, "weight_decay": 1e-4}],
         lr=0.1,
         weight_decay=1e-4,
         max_step=max_step,
-        momentum=0.7,
     )
+    print(max_step)
     for i in range(max_step):
         optimizer.step()

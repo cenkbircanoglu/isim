@@ -1,8 +1,24 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 from torchsummary import summary
+
+
+class FixedBatchNorm(nn.BatchNorm2d):
+    def forward(self, input):
+        return F.batch_norm(
+            input,
+            self.running_mean,
+            self.running_var,
+            self.weight,
+            self.bias,
+            training=False,
+            eps=self.eps,
+        )
+
+
+def gap2d(x, keepdims=False):
+    return torch.mean(x, [2, 3], keepdim=keepdims)
 
 
 class Classifier(nn.Module):
@@ -15,10 +31,9 @@ class Classifier(nn.Module):
             kernel_size=(1, 1),
             bias=False,
         )
-        self.pool = nn.AdaptiveAvgPool2d((1, 1))
 
     def forward(self, x):
-        x = self.pool(x)
+        x = gap2d(x, keepdims=True)
         x = self.classifier(x)
         x = x.view(-1, self.num_classes)
         return x

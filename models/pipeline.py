@@ -4,7 +4,7 @@ import torch
 from torch import nn
 from torchvision import models as torchmodels
 
-from models.classifier import Classifier
+from models.classifier import Classifier, FixedBatchNorm
 from models.decoder import Decoder
 from models.encoder import Encoder
 
@@ -64,7 +64,9 @@ class Pipeline(nn.Module):
 
 if __name__ == "__main__":
     backbone = torchmodels.resnet18(
-        pretrained=True, replace_stride_with_dilation=(0, 0, 0)
+        pretrained=True,
+        replace_stride_with_dilation=(0, 0, 0),
+        norm_layer=FixedBatchNorm,
     )
     encoder = Encoder(backbone=backbone)
     classifier = Classifier(in_channels=512)
@@ -78,7 +80,9 @@ if __name__ == "__main__":
     assert features["cls"].shape == (2, 20)
 
     backbone = torchmodels.resnet50(
-        pretrained=True, replace_stride_with_dilation=(0, 0, 0)
+        pretrained=True,
+        replace_stride_with_dilation=(0, 0, 0),
+        norm_layer=FixedBatchNorm,
     )
     encoder = Encoder(backbone=backbone)
     classifier = Classifier()
@@ -107,7 +111,9 @@ if __name__ == "__main__":
     assert features["seg"].shape == (2, 21, 512, 512)
 
     backbone = torchmodels.resnet50(
-        pretrained=True, replace_stride_with_dilation=(0, 0, 1)
+        pretrained=True,
+        replace_stride_with_dilation=(0, 0, 1),
+        norm_layer=FixedBatchNorm,
     )
     encoder = Encoder(backbone=backbone)
     classifier = Classifier()
@@ -136,7 +142,9 @@ if __name__ == "__main__":
     assert features["seg"].shape == (2, 21, 512, 512)
 
     backbone = torchmodels.resnet50(
-        pretrained=True, replace_stride_with_dilation=(0, 1, 1)
+        pretrained=True,
+        replace_stride_with_dilation=(0, 1, 1),
+        norm_layer=FixedBatchNorm,
     )
     encoder = Encoder(backbone=backbone)
     classifier = Classifier()

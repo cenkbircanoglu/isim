@@ -46,9 +46,7 @@ def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch):
             seg_loss = modified_cross_entropy_loss(seg_logits, seg_label)
             total_cls_loss += cls_loss.item()
             total_seg_loss += seg_loss.item()
-            loss = cls_loss
-            if epoch > 5:
-                loss = cls_loss + seg_loss
+            loss = cls_loss + seg_loss
         with torch.set_grad_enabled(False):
             total_ap_score += get_ap_score(
                 cls_label.cpu().detach().numpy(),
@@ -128,7 +126,6 @@ def calculate_segmentation_metric(dataset, data_type="train"):
     denominator = gtj + resj - gtjresj
     iou = gtjresj / denominator
 
-    print(f"iou: {iou}\tmiou: {np.nanmean(iou)}\tdata_type:{data_type}")
     results = dict(
         zip(
             [
@@ -157,7 +154,7 @@ def calculate_segmentation_metric(dataset, data_type="train"):
             iou,
         )
     )
-    print(results, data_type)
+    print(results, f"miou: {np.nanmean(iou)}", data_type)
     return float(np.nanmean(iou))
 
 

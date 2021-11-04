@@ -1,6 +1,8 @@
+import torch.nn as nn
+import torch.nn.functional as F
 from torchvision import models as torchmodels
 
-from models.classifier import Classifier
+from models.classifier import Classifier, FixedBatchNorm
 from models.decoder import Decoder
 from models.encoder import Encoder
 from models.pipeline import Pipeline
@@ -9,19 +11,27 @@ from models.pipeline import Pipeline
 def initialize_model(cfg):
     if cfg.backbone == "resnet50v1":
         backbone = torchmodels.resnet50(
-            pretrained=True, replace_stride_with_dilation=(0, 0, 1)
+            pretrained=True,
+            replace_stride_with_dilation=(0, 0, 1),
+            norm_layer=FixedBatchNorm,
         )
-    elif cfg.backbone == "resnet50v1":
+    elif cfg.backbone == "resnet50v2":
         backbone = torchmodels.resnet50(
-            pretrained=True, replace_stride_with_dilation=(0, 1, 1)
+            pretrained=True,
+            replace_stride_with_dilation=(0, 1, 1),
+            norm_layer=FixedBatchNorm,
         )
     elif cfg.backbone == "resnet101v1":
         backbone = torchmodels.resnet101(
-            pretrained=True, replace_stride_with_dilation=(0, 0, 1)
+            pretrained=True,
+            replace_stride_with_dilation=(0, 0, 1),
+            norm_layer=FixedBatchNorm,
         )
     elif cfg.backbone == "resnet101v2":
         backbone = torchmodels.resnet101(
-            pretrained=True, replace_stride_with_dilation=(0, 1, 1)
+            pretrained=True,
+            replace_stride_with_dilation=(0, 1, 1),
+            norm_layer=FixedBatchNorm,
         )
     else:
         raise Exception({"message": "fix backbone"})
