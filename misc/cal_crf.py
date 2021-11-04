@@ -5,8 +5,8 @@ from torch import cuda
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from misc.generate_label import generate_pseudo_label
 from dataset_loaders import my_collate
+from misc.generate_label import generate_pseudo_label
 
 
 def _work(process_id, model, dataset_split, dataset, cfg):

@@ -8,7 +8,7 @@ def data_loaders(cfg):
     dataset_train = dataloader.VOC12ClassificationDataset(
         cfg.train_list,
         voc12_root=cfg.voc12_root,
-        resize_long=(320, 640),
+        resize_long=(cfg.crop_size // 2, cfg.crop_size * 2),
         hor_flip=True,
         crop_size=cfg.crop_size,
         crop_method="random",
