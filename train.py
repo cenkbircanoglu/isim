@@ -22,6 +22,7 @@ from utils import get_ap_score, makedirs, log_images, log_loss_summary
 np.random.seed(9)
 random.seed(9)
 torch.manual_seed(9)
+torch.backends.cudnn.benchmark = True
 
 
 def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch):
@@ -31,6 +32,7 @@ def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch):
         enumerate(dataset_loader),
         total=len(dataset_loader.dataset) // dataset_loader.batch_size,
     ):
+        optimizer.zero_grad(set_to_none=True)
         img, cls_label, seg_label = (
             batch["img"].cuda(),
             batch["label"].cuda(),
@@ -53,7 +55,6 @@ def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch):
                 torch.sigmoid(cls_logits).cpu().detach().numpy(),
             )
 
-        optimizer.zero_grad()
         loss.backward()
         optimizer.step(epoch=epoch)
     avg_cls_acc, avg_cls_loss, avg_seg_loss = (
@@ -158,7 +159,7 @@ def calculate_segmentation_metric(dataset, data_type="train"):
     return float(np.nanmean(iou))
 
 
-@hydra.main(config_path="./conf/", config_name="train_pipeline")
+@hydra.main(config_path="./conf/", config_name="train")
 def run_app(cfg: DictConfig) -> None:
     makedirs(cfg)
     (
@@ -253,7 +254,9 @@ def run_app(cfg: DictConfig) -> None:
         crf_counter += 1
 
         if cfg.crf_freq > 0:
-            if crf_counter % cfg.crf_freq == 0 and epoch != cfg.epochs - 1:
+            if (
+                crf_counter % cfg.crf_freq == 0 and epoch != cfg.epochs - 1
+            ) or crf_counter == 5:
                 torch.save(
                     model.module.state_dict(),
                     os.path.join(cfg.weights, f"seg-model-{epoch}.pt"),

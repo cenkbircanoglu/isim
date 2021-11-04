@@ -81,7 +81,7 @@ def calculate_crf(
             )
             val_results.append((idx.cpu().item(), res))
     print("Applying CRF to CAM results")
-    with Pool(processes=2) as pool:
+    with Pool(processes=4) as pool:
         pool.starmap(dataset_train.update_cam, tqdm(tr_results, total=len(tr_results)))
         pool.starmap(
             dataset_valid.update_cam, tqdm(val_results, total=len(val_results))

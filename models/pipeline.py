@@ -2,9 +2,9 @@ from enum import Enum
 
 import torch
 from torch import nn
-from torchvision import models as torchmodels
 
-from models.classifier import Classifier, FixedBatchNorm
+from models.resnet import resnet50
+from models.classifier import Classifier
 from models.decoder import Decoder
 from models.encoder import Encoder
 
@@ -63,27 +63,7 @@ class Pipeline(nn.Module):
 
 
 if __name__ == "__main__":
-    backbone = torchmodels.resnet18(
-        pretrained=True,
-        replace_stride_with_dilation=(0, 0, 0),
-        norm_layer=FixedBatchNorm,
-    )
-    encoder = Encoder(backbone=backbone)
-    classifier = Classifier(in_channels=512)
-    decoder = Decoder(input_shape=(512, 512))
-    pipeline = Pipeline(
-        encoder_model=encoder, classifier_model=classifier, decoder_model=decoder
-    )
-    pipeline.cuda()
-    x = torch.rand([2, 3, 512, 512], device="cuda")
-    features = pipeline.forward(x)
-    assert features["cls"].shape == (2, 20)
-
-    backbone = torchmodels.resnet50(
-        pretrained=True,
-        replace_stride_with_dilation=(0, 0, 0),
-        norm_layer=FixedBatchNorm,
-    )
+    backbone = resnet50(pretrained=True, strides=(2, 2, 2, 2))
     encoder = Encoder(backbone=backbone)
     classifier = Classifier()
     decoder = Decoder(input_shape=(512, 512))
@@ -110,11 +90,7 @@ if __name__ == "__main__":
     assert features["cams"].shape == (20, 16, 16)
     assert features["seg"].shape == (2, 21, 512, 512)
 
-    backbone = torchmodels.resnet50(
-        pretrained=True,
-        replace_stride_with_dilation=(0, 0, 1),
-        norm_layer=FixedBatchNorm,
-    )
+    backbone = resnet50(pretrained=True, strides=(2, 2, 2, 1))
     encoder = Encoder(backbone=backbone)
     classifier = Classifier()
     decoder = Decoder(input_shape=(512, 512))
@@ -141,11 +117,7 @@ if __name__ == "__main__":
     assert features["cams"].shape == (20, 32, 32)
     assert features["seg"].shape == (2, 21, 512, 512)
 
-    backbone = torchmodels.resnet50(
-        pretrained=True,
-        replace_stride_with_dilation=(0, 1, 1),
-        norm_layer=FixedBatchNorm,
-    )
+    backbone = resnet50(pretrained=True, strides=(2, 2, 1, 1))
     encoder = Encoder(backbone=backbone)
     classifier = Classifier()
     decoder = Decoder(input_shape=(512, 512))

@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: ./results/train-unet/train-seg-unet/${name}/${now:%Y-%m-%d-%H-%M}
+    dir: ./results/train-unet/train-seg-unet/${name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
 batch_size: 32
 epochs: 100
 lr: 0.1
@@ -9,8 +9,8 @@ workers: 2
 weights: ./weights
 logs: ./logs
 voc12_root: ${hydra:runtime.cwd}/../vision/data/raw/VOCdevkit/VOC2012
-train_list: ${hydra:runtime.cwd}/voc12/train.txt
-val_list: ${hydra:runtime.cwd}/voc12/val.txt
+train_list: ${hydra:runtime.cwd}/voc12/dev.txt
+val_list: ${hydra:runtime.cwd}/voc12/dev.txt
 cls_label_path: ${hydra:runtime.cwd}/voc12/cls_labels.npy
 crop_size: 320
 weight_decay: 1e-4
@@ -20,7 +20,7 @@ backbone: resnet50v1
 cam_eval_thres: 0.3
 vis_images: 64
 vis_freq: 1
-crf_freq: 5
+crf_freq: 25
 temp_dir: ${hydra:runtime.cwd}/results/temp_dir/${now:%Y-%m-%d}/${now:%H-%M-%S}
 in_channels: 2048
 name: resnet50
