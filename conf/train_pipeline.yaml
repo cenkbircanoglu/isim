@@ -2,7 +2,7 @@ hydra:
   run:
     dir: ./results/train-unet/train-seg-unet/${name}/${now:%Y-%m-%d-%H-%M}
 batch_size: 32
-epochs: 50
+epochs: 100
 lr: 0.1
 device: 'cuda:0'
 workers: 2
