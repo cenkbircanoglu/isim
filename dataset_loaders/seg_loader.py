@@ -13,7 +13,8 @@ def data_loaders(cfg):
         rescale=None,
         hor_flip=True,
         crop_method="random",
-        resize_long=(cfg.crop_size // 2, cfg.crop_size * 2),
+        #resize_long=(cfg.crop_size // 2, cfg.crop_size * 2),
+        resize_long=(320, 640),
         temp_dir=cfg.temp_dir,
     )
 

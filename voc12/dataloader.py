@@ -327,12 +327,20 @@ class VOC12PseudoSegmentationDataset(VOC12ClassificationDataset):
         self.superpixel_dir = superpixel_dir
         self.temp_dir = temp_dir
 
-    def update_cam(self, idx, cam):
+    def update_cam(self, idx, cam, fg_thres=None):
+        cams, keys = cam
+
+        keys = np.pad(keys + 1, (1, 0), mode="constant")
+
+        fg_conf_cam = np.pad(
+            cams, ((1, 0), (0, 0), (0, 0)), mode="constant", constant_values=fg_thres
+        )
+        fg_conf_cam = np.argmax(fg_conf_cam, axis=0)
+
         name = self.img_name_list[idx]
         name_str = decode_int_filename(name)
         path = os.path.join(self.temp_dir, name_str + ".png")
 
-        fg_conf_cam, keys = cam
         img = np.asarray(imageio.imread(get_img_path(name_str, self.voc12_root)))
         pred = crf_inference_label(img, fg_conf_cam, n_labels=keys.shape[0])
         conf = keys[pred]
