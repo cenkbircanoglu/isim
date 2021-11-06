@@ -8,9 +8,19 @@ from chainercv.evaluations import calc_semantic_segmentation_confusion
 from omegaconf import DictConfig
 from tqdm import tqdm
 
+from logger import Logger
+from utils import log_loss_summary
+
 
 @hydra.main(config_path="./conf/", config_name="eval_cam")
 def run_app(cfg: DictConfig) -> None:
+    logger = Logger(cfg.logs)
+    try:
+        epoch = cfg.cam_out_dir.split("/")[-2].split("-")[-1]
+        print(epoch)
+        epoch = int(epoch)
+    except:
+        epoch = cfg.last_epoch
     dataset = VOCSemanticSegmentationDataset(
         split=cfg.infer_set, data_dir=cfg.voc12_root
     )
@@ -44,7 +54,6 @@ def run_app(cfg: DictConfig) -> None:
         denominator = gtj + resj - gtjresj
         iou = gtjresj / denominator
 
-        print(f"iou: {iou}\tmiou: {np.nanmean(iou)}\tFolder: {folder}")
         results = dict(
             zip(
                 [
@@ -75,6 +84,8 @@ def run_app(cfg: DictConfig) -> None:
         )
         results["miou"] = np.nanmean(iou)
         logging.info(f"iou: {iou}\tmiou: {np.nanmean(iou)}\tFolder: {folder}")
+        for key, value in results.items():
+            log_loss_summary(logger, value, epoch, tag=f"eval_{cfg.infer_set}_{key}")
 
 
 if __name__ == "__main__":

@@ -57,17 +57,19 @@ def run_app(cfg: DictConfig) -> None:
         imgs = data["img"]
         size = data["size"]
         label = label.to(device)
-
-        with torch.set_grad_enabled(False):
-            cams = []
-            for img in imgs:
-                cam = model(
-                    img[0].to(device),
-                    model_mode=ModelMode.classification,
-                    mode=ProcessMode.infer,
-                )
-                cams.append(cam["cams"])
-            extract_valid_cams(cams, size, label, cfg, img_name)
+        output_folder = os.path.join(cfg.output_dir, "0")
+        output_path = os.path.join(output_folder, img_name + ".npy")
+        if not os.path.exists(output_path):
+            with torch.set_grad_enabled(False):
+                cams = []
+                for img in imgs:
+                    cam = model(
+                        img[0].to(device),
+                        model_mode=ModelMode.classification,
+                        mode=ProcessMode.infer,
+                    )
+                    cams.append(cam["cams"])
+                extract_valid_cams(cams, size, label, cfg, img_name)
 
 
 def data_loaders(cfg):

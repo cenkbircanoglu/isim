@@ -424,11 +424,17 @@ if __name__ == "__main__":
     aa = VOC12PseudoSegmentationDataset(
         img_name_list_path="./voc12/train_aug.txt",
         voc12_root="../vision/data/raw/VOCdevkit/VOC2012",
+        temp_dir="test",
     )
-    percentages = []
+    maxes = []
+    mins = []
     for i in aa:
-        percentages.append(i["original_label"])
-    print(percentages)
+        shape = i["original_label"].shape
+        maxes.append(max(shape))
+        mins.append(min(shape))
+    from statistics import mean
+
+    print(mean(maxes), mean(mins))
 # aa = VOC12ImageDataset(
 #     voc12_root="../../vision/data/raw/VOCdevkit/VOC2012",
 #     img_name_list_path="../voc12/train_aug.txt",
