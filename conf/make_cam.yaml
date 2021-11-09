@@ -7,10 +7,9 @@ logs: ./logs
 voc12_root: ${hydra:runtime.cwd}/../vision/data/raw/VOCdevkit/VOC2012
 infer_list: ${hydra:runtime.cwd}/voc12/val.txt
 cls_label_path: ${hydra:runtime.cwd}/voc12/cls_labels.npy
-crop_size: 320
 num_classes: 20
 out_ch: 21
 backbone: resnet50v1
 output_dir: cam_outputs/
 in_channels: 2048
-name: resnet18
+crop_size: 320

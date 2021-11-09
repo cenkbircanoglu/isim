@@ -83,6 +83,7 @@ def run_app(cfg: DictConfig) -> None:
             )
         )
         results["miou"] = np.nanmean(iou)
+        results["miou_without_background"] = np.nanmean(iou[1:])
         logging.info(f"iou: {iou}\tmiou: {np.nanmean(iou)}\tFolder: {folder}")
         for key, value in results.items():
             log_loss_summary(logger, value, epoch, tag=f"eval_{cfg.infer_set}_{key}")

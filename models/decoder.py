@@ -10,6 +10,7 @@ class Decoder(nn.Module):
     ):
         super(Decoder, self).__init__()
         aspp_dilate = [6, 12, 18]
+        # aspp_dilate = [12, 24, 36]
 
         inplanes = 2048
         low_level_planes = 256

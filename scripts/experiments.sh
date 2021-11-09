@@ -18,25 +18,25 @@
 #python -m train backbone=resnet50v4 epochs=16 crop_size=448 batch_size=8
 #python -m train backbone=resnet50v4 epochs=16 crop_size=512 batch_size=4
 
-python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=96 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop256/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=64 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop320/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop448/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop512/train crf_freq=20 epochs=50
+#python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=96 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop256/train crf_freq=25 epochs=50
+#python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=96 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop256/train crf_freq=25 epochs=50
+#python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=64 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop256/train crf_freq=25 epochs=50
+#python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=8 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop256/train crf_freq=25 epochs=50
+#
+#python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=64 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop320/train crf_freq=25 epochs=50
+#python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=64 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop320/train crf_freq=25 epochs=50
+#python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop320/train crf_freq=25 epochs=50
+#python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=8 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop320/train crf_freq=25 epochs=50
 
-python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=96 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop256/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=64 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop320/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop448/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=24 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop512/train crf_freq=20 epochs=50
+python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop448/train crf_freq=25 epochs=50
+python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop448/train crf_freq=25 epochs=50
+python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=16 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop448/train crf_freq=25 epochs=50
+python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=6 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop448/train crf_freq=25 epochs=50
 
-python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=64 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop256/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop320/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=24 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop448/train crf_freq=20 epochs=50
-python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=16 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop512/train crf_freq=20 epochs=50
-
-python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=256 batch_size=8 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop256/train crf_freq=20 epoch=50
-python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=320 batch_size=8 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop320/train crf_freq=20 epoch=50
-python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=448 batch_size=6 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop448/train crf_freq=20 epoch=50
-python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train_aug.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=4 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop512/train crf_freq=20 epoch=50
+python -m train backbone=resnet50v1 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=32 hydra.run.dir=$(pwd)/results/pipeline/resnet50v1/crop512/train crf_freq=25 epochs=50
+python -m train backbone=resnet50v2 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=24 hydra.run.dir=$(pwd)/results/pipeline/resnet50v2/crop512/train crf_freq=25 epochs=50
+python -m train backbone=resnet50v3 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=12 hydra.run.dir=$(pwd)/results/pipeline/resnet50v3/crop512/train crf_freq=25 epochs=50
+python -m train backbone=resnet50v4 train_list=$(pwd)/voc12/train.txt val_list=$(pwd)/voc12/val.txt crop_size=512 batch_size=4 hydra.run.dir=$(pwd)/results/pipeline/resnet50v4/crop512/train crf_freq=25 epochs=50
 
 
 #
