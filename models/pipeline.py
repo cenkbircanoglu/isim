@@ -143,3 +143,30 @@ if __name__ == "__main__":
     )
     assert features["cams"].shape == (20, 64, 64)
     assert features["seg"].shape == (2, 21, 512, 512)
+
+    backbone = resnet50(pretrained=True, strides=(2, 1, 1, 1))
+    encoder = Encoder(backbone=backbone)
+    classifier = Classifier()
+    decoder = Decoder(input_shape=(512, 512))
+    pipeline = Pipeline(
+        encoder_model=encoder, classifier_model=classifier, decoder_model=decoder
+    )
+    pipeline.cuda()
+    x = torch.rand([2, 3, 512, 512], device="cuda")
+    features = pipeline.forward(x)
+    assert features["cls"].shape == (2, 20)
+
+    features = pipeline.forward(x, model_mode=ModelMode.segmentation)
+    assert features["cls"].shape == (2, 20)
+    assert features["seg"].shape == (2, 21, 512, 512)
+
+    features = pipeline.forward(
+        x, model_mode=ModelMode.classification, mode=ProcessMode.infer
+    )
+    assert features["cams"].shape == (20, 128, 128)
+
+    features = pipeline.forward(
+        x, model_mode=ModelMode.segmentation, mode=ProcessMode.infer
+    )
+    assert features["cams"].shape == (20, 128, 128)
+    assert features["seg"].shape == (2, 21, 512, 512)
