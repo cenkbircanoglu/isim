@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CROP_SIZE=256
+CROP_SIZE=320
 
 for BACKBONE in resnet50v1 resnet50v2 resnet50v3 resnet50v4; do
     for model_name in seg-model-4 seg-model-24 final-model; do
