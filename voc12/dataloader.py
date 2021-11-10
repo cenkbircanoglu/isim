@@ -229,8 +229,8 @@ class VOC12ClassificationDatasetMSF(VOC12ClassificationDataset):
             s_img = self.img_normal(s_img)
             s_img = imutils.HWC_to_CHW(s_img)
             ms_img_list.append(np.stack([s_img, np.flip(s_img, -1)], axis=0))
-        if len(self.scales) == 1:
-            ms_img_list = ms_img_list[0]
+        # if len(self.scales) == 1:
+        #    ms_img_list = ms_img_list[0]
 
         out = {
             "name": name_str,

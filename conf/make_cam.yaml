@@ -13,3 +13,4 @@ backbone: resnet50v1
 output_dir: cam_outputs/
 in_channels: 2048
 crop_size: 320
+scales: 1.0-0.5-1.5-2.0

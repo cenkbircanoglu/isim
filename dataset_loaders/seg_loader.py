@@ -25,12 +25,13 @@ def data_loaders(cfg):
         voc12_root=cfg.voc12_root,
         temp_dir=cfg.temp_dir,
     )
-
+    scales = [float(i) for i in str(cfg.scales).split("-")]
+    print("Scales", scales)
     train_dataset = dataloader.VOC12ClassificationDatasetMSF(
-        cfg.train_list, voc12_root=cfg.voc12_root, scales=[1.0, 0.5, 1.5, 2.0]
+        cfg.train_list, voc12_root=cfg.voc12_root, scales=scales
     )
     valid_dataset = dataloader.VOC12ClassificationDatasetMSF(
-        cfg.val_list, voc12_root=cfg.voc12_root, scales=[1.0, 0.5, 1.5, 2.0]
+        cfg.val_list, voc12_root=cfg.voc12_root, scales=scales
     )
 
     return dataset_train, dataset_valid, train_dataset, valid_dataset

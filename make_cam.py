@@ -73,8 +73,10 @@ def run_app(cfg: DictConfig) -> None:
 
 
 def data_loaders(cfg):
+    scales = [float(i) for i in str(cfg.scales).split("-")]
+    print("Scales", scales)
     dataset = dataloader.VOC12ClassificationDatasetMSF(
-        cfg.infer_list, voc12_root=cfg.voc12_root, scales=[1.0, 0.5, 1.5, 2.0]
+        cfg.infer_list, voc12_root=cfg.voc12_root, scales=scales
     )
 
     loader = DataLoader(
