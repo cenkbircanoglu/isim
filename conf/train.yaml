@@ -1,0 +1,29 @@
+hydra:
+  run:
+    dir: ./results/train-pipeline/${name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+batch_size: 32
+epochs: 250
+lr: 0.1
+device: 'cuda:0'
+workers: 2
+weights: ./weights
+logs: ./logs
+voc12_root: ${hydra:runtime.cwd}/../vision/data/raw/VOCdevkit/VOC2012
+train_list: ${hydra:runtime.cwd}/voc12/dev.txt
+val_list: ${hydra:runtime.cwd}/voc12/dev.txt
+cls_label_path: ${hydra:runtime.cwd}/voc12/cls_labels.npy
+crop_size: 320
+weight_decay: 1e-4
+out_ch: 21
+num_classes: 20
+backbone: resnet50v1
+cam_eval_thres: 0.3
+vis_images: 64
+vis_freq: 1
+crf_freq: 50
+temp_dir: ${hydra:runtime.cwd}/results/temp_dir/${now:%Y-%m-%d}/${now:%H-%M-%S}
+in_channels: 2048
+name: resnet50
+iter_count: 0
+max_step: 5
+scales: 1.0-0.5-1.5-2.0
