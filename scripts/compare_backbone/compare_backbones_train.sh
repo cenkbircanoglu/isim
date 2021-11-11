@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $(dirname $0)/train.sh
+source $(dirname $0)/../train.sh
 
 run_experiment resnet50v1 256 96 25 50
 run_experiment resnet50v2 256 96 25 50

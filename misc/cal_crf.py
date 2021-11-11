@@ -1,5 +1,4 @@
 from functools import partial
-from functools import partial
 from multiprocessing import Pool
 
 import torch
@@ -59,6 +58,7 @@ def calculate_crf(
     dataset_train,
     dataset_valid,
     device,
+    crf_batch_size=500,
     *args,
     **kwargs
 ):
@@ -73,23 +73,39 @@ def calculate_crf(
             img_i = [img_ii.to(device) for img_ii in item["img"]]
             res = generate_pseudo_label(model, img_i, item["label"][0], item["size"])
             tr_results.append((idx.cpu().item(), res))
+            if len(tr_results) >= crf_batch_size:
+                with Pool(processes=4) as pool:
+                    pool.starmap(
+                        partial(dataset_train.update_cam, fg_thres=cfg.cam_eval_thres),
+                        tqdm(tr_results, total=len(tr_results)),
+                    )
+                tr_results = []
         print("\nCreating Pseudo Labels for validation")
         for item in tqdm(val_loader, total=len(val_loader.dataset)):
             idx = item["idx"][0]
             img_i = [img_ii.to(device) for img_ii in item["img"]]
             res = generate_pseudo_label(model, img_i, item["label"][0], item["size"])
             val_results.append((idx.cpu().item(), res))
+            if len(val_results) >= crf_batch_size:
+                with Pool(processes=4) as pool:
+                    pool.starmap(
+                        partial(dataset_valid.update_cam, fg_thres=cfg.cam_eval_thres),
+                        tqdm(val_results, total=len(val_results)),
+                    )
+                val_results = []
     print("Applying CRF to CAM results")
-    with Pool(processes=4) as pool:
-        pool.starmap(
-            partial(dataset_train.update_cam, fg_thres=cfg.cam_eval_thres),
-            tqdm(tr_results, total=len(tr_results)),
-        )
-    with Pool(processes=4) as pool:
-        pool.starmap(
-            partial(dataset_valid.update_cam, fg_thres=cfg.cam_eval_thres),
-            tqdm(val_results, total=len(val_results)),
-        )
+    if len(tr_results) > 0:
+        with Pool(processes=4) as pool:
+            pool.starmap(
+                partial(dataset_train.update_cam, fg_thres=cfg.cam_eval_thres),
+                tqdm(tr_results, total=len(tr_results)),
+            )
+    if len(val_results) > 0:
+        with Pool(processes=4) as pool:
+            pool.starmap(
+                partial(dataset_valid.update_cam, fg_thres=cfg.cam_eval_thres),
+                tqdm(val_results, total=len(val_results)),
+            )
 
     loader_train = DataLoader(
         dataset_train,
