@@ -27,3 +27,4 @@ name: resnet50
 iter_count: 0
 max_step: 5
 scales: 1.0-0.5-1.5-2.0
+dilate_version: 1

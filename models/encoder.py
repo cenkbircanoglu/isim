@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
-
 from torchsummary import summary
-from torchvision import models as torchmodels
 
 from models.resnet import resnet50
 

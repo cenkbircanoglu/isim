@@ -23,3 +23,9 @@ run_experiment 0.15
 run_experiment 0.2
 run_experiment 0.25
 run_experiment 0.3
+run_experiment 0.35
+run_experiment 0.4
+run_experiment 0.45
+run_experiment 0.5
+run_experiment 0.55
+run_experiment 0.6
