@@ -63,6 +63,7 @@ def initialize_model(cfg):
         in_channels=cfg.in_channels,
         out_ch=cfg.out_ch,
         input_shape=(cfg.crop_size, cfg.crop_size),
+        dilate_version=cfg.dilate_version,
     )
     model = Pipeline(
         encoder_model=encoder_model,

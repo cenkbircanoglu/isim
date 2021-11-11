@@ -6,12 +6,21 @@ from models.deeplab import DeepLabHeadV3Plus
 
 class Decoder(nn.Module):
     def __init__(
-        self, out_ch=21, input_shape=(320, 320), in_channels=2048, *args, **kwargs
+        self,
+        out_ch=21,
+        input_shape=(320, 320),
+        in_channels=2048,
+        dilate_version=1,
+        *args,
+        **kwargs,
     ):
         super(Decoder, self).__init__()
-        aspp_dilate = [6, 12, 18]
-        # aspp_dilate = [12, 24, 36]
-
+        if dilate_version == 1:
+            aspp_dilate = [6, 12, 18]
+        elif dilate_version == 2:
+            aspp_dilate = [12, 24, 36]
+        else:
+            raise Exception({"message": f"Unknown Dilation Version {dilate_version}"})
         inplanes = 2048
         low_level_planes = 256
         assert in_channels == inplanes
