@@ -2,7 +2,7 @@
 BACKBONE=resnet50v2
 CROP_SIZE=512
 
-for model_name in 4 199 224 249 274 299 324 349 374 399 424 449 474 499 524 549 574; do
+for model_name in 4 49 99 149 174 199 224 249 274 299 324 349 374 399 424 449; do
     python -m make_cam \
         backbone=${BACKBONE} \
         weights=$(pwd)/results/pipeline/${BACKBONE}/train/weights/seg-model-${model_name}.pt \
