@@ -1,5 +1,5 @@
 #!/bin/bash
-BACKBONE=resnet50v2
+BACKBONE=resnet101v2
 CROP_SIZE=512
 
 for model_name in 4 49 99 149 174 199 224 249 274 299 324 349 374 399 424 449; do

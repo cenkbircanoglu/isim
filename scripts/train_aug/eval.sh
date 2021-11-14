@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BACKBONE=resnet50v2
+BACKBONE=resnet101v2
 CAM_EVAL_THRESHOLD=0.15
 
 for model_name in 4 49 99 149 174 199 224 249 274 299 324 349 374 399 424 449; do
