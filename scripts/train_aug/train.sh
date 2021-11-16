@@ -18,4 +18,4 @@ run_experiment() {
         epochs=${EPOCHS}
 }
 
-run_experiment resnet50v2 512 24 25 1000
+run_experiment resnet101v2 512 16 25 1000
