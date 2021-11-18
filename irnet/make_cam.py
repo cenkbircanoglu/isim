@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from omegaconf import DictConfig
-from torch import multiprocessing, cuda
+from torch import cuda
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
 
@@ -96,7 +96,7 @@ def _work(process_id, model, dataset, cfg):
                 print("%d " % ((5 * iter + 1) // (len(databin) // 20)), end="")
 
 
-@hydra.main(config_path="./conf/irnet", config_name="make_cam")
+@hydra.main(config_path="../conf/irnet", config_name="make_cam")
 def run_app(cfg: DictConfig) -> None:
     os.makedirs(cfg.output_dir, exist_ok=True)
     device = torch.device("cpu" if not torch.cuda.is_available() else cfg.device)
@@ -115,10 +115,8 @@ def run_app(cfg: DictConfig) -> None:
     dataset = torchutils.split_dataset(dataset, n_gpus)
 
     print("[ ", end="")
-    multiprocessing.spawn(_work, nprocs=n_gpus, args=(model, dataset, cfg), join=True)
+    _work(0, model, dataset, cfg)
     print("]")
-
-    torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":

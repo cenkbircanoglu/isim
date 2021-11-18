@@ -5,7 +5,7 @@ device: 'cuda:0'
 weights: ${hydra:runtime.cwd}/train-unet/train-seg-unet/pipeline-resnet18-320/2021-06-26/weights/final-model.pt
 logs: ./logs
 voc12_root: ${hydra:runtime.cwd}/../vision/data/raw/VOCdevkit/VOC2012
-infer_list: ${hydra:runtime.cwd}/voc12/val.txt
+train_list: ${hydra:runtime.cwd}/voc12/val.txt
 cls_label_path: ${hydra:runtime.cwd}/voc12/cls_labels.npy
 num_classes: 20
 out_ch: 21

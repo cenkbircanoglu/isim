@@ -62,7 +62,7 @@ def _work(process_id, infer_dataset, cfg):
             print("%d " % ((5 * iter + 1) // (len(databin) // 20)), end="")
 
 
-@hydra.main(config_path="./conf/irnet", config_name="cam_to_ir_label")
+@hydra.main(config_path="../conf/irnet", config_name="cam_to_ir_label")
 def run_app(cfg: DictConfig) -> None:
     os.makedirs(cfg.output_dir, exist_ok=True)
     dataset = voc12.dataloader.VOC12ImageDataset(
