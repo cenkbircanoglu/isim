@@ -1,5 +1,4 @@
 import os
-import random
 
 import hydra
 import numpy as np
@@ -17,11 +16,9 @@ from misc import torchutils
 from misc.cal_crf import calculate_crf
 from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
-from utils import get_ap_score, makedirs, log_images, log_loss_summary
+from utils import get_ap_score, makedirs, log_images, log_loss_summary, set_seed
 
-np.random.seed(9)
-random.seed(9)
-torch.manual_seed(9)
+set_seed(3407)
 torch.backends.cudnn.benchmark = True
 
 

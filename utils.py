@@ -1,8 +1,19 @@
 import os
+import random
 
 import numpy as np
+import torch
 from skimage.color import label2rgb
 from sklearn.metrics import average_precision_score
+
+
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 
 def log_loss_summary(logger, loss, step, tag):

@@ -11,7 +11,10 @@ from tqdm import tqdm
 from dataset_loaders import my_collate
 from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
+from utils import set_seed
 from voc12 import dataloader
+
+set_seed(3407)
 
 
 def extract_valid_cams(cams, size, label, cfg, img_name):

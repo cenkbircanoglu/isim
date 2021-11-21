@@ -9,7 +9,9 @@ from omegaconf import DictConfig
 from tqdm import tqdm
 
 from logger import Logger
-from utils import log_loss_summary
+from utils import log_loss_summary, set_seed
+
+set_seed(3407)
 
 
 @hydra.main(config_path="./conf/", config_name="eval_cam")
