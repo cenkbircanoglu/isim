@@ -11,6 +11,7 @@ from tqdm import tqdm
 from misc import imutils
 from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
+
 from utils import set_seed
 from voc12 import dataloader
 
