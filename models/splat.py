@@ -10,8 +10,7 @@ __all__ = ["SplAtConv2d"]
 
 
 class SplAtConv2d(Module):
-    """Split-Attention Conv2d
-    """
+    """Split-Attention Conv2d"""
 
     def __init__(
         self,

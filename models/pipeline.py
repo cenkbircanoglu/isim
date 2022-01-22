@@ -3,10 +3,10 @@ from enum import Enum
 import torch
 from torch import nn
 
-from models.resnet import resnet50
 from models.classifier import Classifier
 from models.decoder import Decoder
 from models.encoder import Encoder
+from models.resnet import resnet50
 
 
 class ModelMode(Enum):

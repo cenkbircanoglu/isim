@@ -22,12 +22,14 @@ from models.pipeline import ModelMode, ProcessMode
 from utils import get_ap_score, makedirs, log_images, log_loss_summary, set_seed
 
 
-def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch, scaler=None):
+def train_pipeline_one_epoch(
+    model, dataset_loader, optimizer, epoch, scaler=None
+):
     model.train()
     total_cnt = total_cls_loss = total_seg_loss = total_ap_score = 0.0
     for i, batch in tqdm(
-            enumerate(dataset_loader),
-            total=len(dataset_loader.dataset) // dataset_loader.batch_size,
+        enumerate(dataset_loader),
+        total=len(dataset_loader.dataset) // dataset_loader.batch_size,
     ):
         optimizer.zero_grad(set_to_none=True)
         img, cls_label, seg_label = (
@@ -40,7 +42,9 @@ def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch, scaler=Non
         with torch.cuda.amp.autocast(enabled=scaler is not None):
             with torch.set_grad_enabled(True):
                 d = model(
-                    img, model_mode=ModelMode.segmentation, mode=ProcessMode.train
+                    img,
+                    model_mode=ModelMode.segmentation,
+                    mode=ProcessMode.train,
                 )
                 cls_logits, seg_logits = d["cls"], d["seg"]
                 cls_loss = mlsm_loss(cls_logits, cls_label)
@@ -72,8 +76,8 @@ def eval_pipeline_one_epoch(model, dataset_loader, epoch, logger, cfg):
     model.eval()
     total_cnt = total_cls_loss = total_seg_loss = total_ap_score = 0.0
     for i, batch in tqdm(
-            enumerate(dataset_loader),
-            total=len(dataset_loader.dataset) // dataset_loader.batch_size,
+        enumerate(dataset_loader),
+        total=len(dataset_loader.dataset) // dataset_loader.batch_size,
     ):
         with torch.no_grad():
             img, cls_label, seg_label = (
@@ -253,7 +257,9 @@ def run_app(cfg: DictConfig) -> None:
     for epoch in tqdm(range(cfg.epochs), total=cfg.epochs):
 
         if epoch == 0:
-            miou = calculate_segmentation_metric(loader_valid.dataset, epoch, data_type="train")
+            miou = calculate_segmentation_metric(
+                loader_valid.dataset, epoch, data_type="train"
+            )
             log_loss_summary(logger, miou, epoch, tag=f"val_miou")
 
         model, tr_cls_acc, tr_cls_loss, tr_seg_loss = train_pipeline_one_epoch(
@@ -275,10 +281,12 @@ def run_app(cfg: DictConfig) -> None:
         log_loss_summary(logger, float(val_cls_loss), epoch, tag=f"val_cls_loss")
         log_loss_summary(logger, float(val_seg_loss), epoch, tag=f"val_seg_loss")
         if ((epoch + 1) % cfg.crf_freq == 0 and (epoch + 1) > 5) or (
-                epoch + 1
+            epoch + 1
         ) == 5:
             if crf_counter == cfg.crf_counter:
-                logging.info(f'Stopping the training as it reached the crf_counter: {cfg.crf_counter}, {crf_counter}')
+                logging.info(
+                    f"Stopping the training as it reached the crf_counter: {cfg.crf_counter}, {crf_counter}"
+                )
                 break
             torch.save(
                 model.module.state_dict(),
@@ -298,7 +306,9 @@ def run_app(cfg: DictConfig) -> None:
             )
             loader_train = loaders["train"]
             loader_valid = loaders["valid"]
-            miou = calculate_segmentation_metric(loader_valid.dataset, epoch, data_type="train")
+            miou = calculate_segmentation_metric(
+                loader_valid.dataset, epoch, data_type="train"
+            )
             log_loss_summary(logger, miou, epoch, tag=f"train_miou")
             crf_counter += 1
             log_loss_summary(logger, crf_counter, epoch, tag=f"crf_counter")

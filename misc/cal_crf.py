@@ -52,16 +52,16 @@ def updater(queue, dataset=None, fg_thres=None):
 
 
 def calculate_crf(
-        model,
-        cfg,
-        tr_loader,
-        val_loader,
-        dataset_train,
-        dataset_valid,
-        device,
-        crf_batch_size=500,
-        *args,
-        **kwargs
+    model,
+    cfg,
+    tr_loader,
+    val_loader,
+    dataset_train,
+    dataset_valid,
+    device,
+    crf_batch_size=500,
+    *args,
+    **kwargs
 ):
     model.eval()
     tr_results = []

@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 from voc12 import dataloader
 from voc12.dataloader import TorchvisionNormalize
 
