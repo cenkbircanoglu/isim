@@ -226,7 +226,8 @@ class VOC12ClassificationDatasetMSF(VOC12ClassificationDataset):
                 s_img = img
             else:
                 s_img = imutils.pil_rescale(img, s, order=3)
-            s_img = self.img_normal(s_img)
+            if self.img_normal:
+                s_img = self.img_normal(s_img)
             s_img = imutils.HWC_to_CHW(s_img)
             ms_img_list.append(np.stack([s_img, np.flip(s_img, -1)], axis=0))
         # if len(self.scales) == 1:

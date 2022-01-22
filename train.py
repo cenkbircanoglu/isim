@@ -9,7 +9,6 @@ from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from dataset_loaders import seg_loader, my_collate
 from logger import Logger
 from losses import modified_cross_entropy_loss, mlsm_loss
 from misc import torchutils
@@ -17,8 +16,9 @@ from misc.cal_crf import calculate_crf
 from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
 from utils import get_ap_score, makedirs, log_images, log_loss_summary, set_seed
+from voc12 import seg_loader, my_collate
 
-set_seed(3407)
+set_seed(9)
 torch.backends.cudnn.benchmark = True
 
 
@@ -33,7 +33,7 @@ def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch):
         img, cls_label, seg_label = (
             batch["img"].cuda(),
             batch["label"].cuda(),
-            batch["seg_label"].long().cuda(),
+            batch["pseudo_mask"].long().cuda(),
         )
         batch_size = cls_label.size(0)
         total_cnt += batch_size
@@ -73,7 +73,7 @@ def eval_pipeline_one_epoch(model, dataset_loader, epoch, logger, cfg):
             img, cls_label, seg_label = (
                 batch["img"].cuda(),
                 batch["label"].cuda(),
-                batch["seg_label"].long().cuda(),
+                batch["pseudo_mask"].long().cuda(),
             )
             batch_size = cls_label.size(0)
             total_cnt += batch_size
@@ -107,8 +107,7 @@ def calculate_segmentation_metric(dataset, data_type="train"):
     labels = []
 
     for item in tqdm(dataset):
-        seg_label, org_seg_label = (item["seg_label"], item["original_label"])
-
+        seg_label, org_seg_label = (item["pseudo_mask"].numpy(), item["mask"].numpy())
         seg_label_resized = Image.fromarray(seg_label).resize(
             org_seg_label.shape[::-1], resample=Image.BILINEAR
         )
@@ -222,7 +221,6 @@ def run_app(cfg: DictConfig) -> None:
         max_step=max_step,
         logger=logger,
     )
-
     crf_counter = 0
     for epoch in tqdm(range(cfg.epochs), total=cfg.epochs):
 

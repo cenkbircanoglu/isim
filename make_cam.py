@@ -6,13 +6,13 @@ import torch
 import torch.nn.functional as F
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
+from torchvision import transforms
 from tqdm import tqdm
 
-from dataset_loaders import my_collate
 from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
 from utils import set_seed
-from voc12 import dataloader
+from voc12 import dataloader_2, custom_transforms, dataloader, my_collate
 
 set_seed(3407)
 
@@ -48,7 +48,7 @@ def run_app(cfg: DictConfig) -> None:
     os.makedirs(cfg.output_dir, exist_ok=True)
     device = torch.device("cpu" if not torch.cuda.is_available() else cfg.device)
 
-    data_loader = data_loaders(cfg)
+    data_loader = data_loaders_new(cfg)
     model = initialize_model(cfg)
     model.load_state_dict(torch.load(cfg.weights), strict=True)
     model.to(device)
@@ -80,6 +80,33 @@ def data_loaders(cfg):
     print("Scales", scales)
     dataset = dataloader.VOC12ClassificationDatasetMSF(
         cfg.infer_list, voc12_root=cfg.voc12_root, scales=scales
+    )
+
+    loader = DataLoader(
+        dataset,
+        drop_last=False,
+        num_workers=0,
+        persistent_workers=False,
+        collate_fn=my_collate,
+    )
+
+    return loader
+
+
+def data_loaders_new(cfg):
+    scales = [float(i) for i in str(cfg.scales).split("-")]
+    print("Scales", scales)
+    transform = transforms.Compose(
+        [
+            custom_transforms.CustomPILToTensor(),
+            custom_transforms.CustomConvertImageDtype(torch.float),
+            custom_transforms.CustomNormalize(
+                mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
+            ),
+        ]
+    )
+    dataset = dataloader_2.VOC12ClassificationDatasetMSF(
+        cfg.infer_list, voc12_root=cfg.voc12_root, scales=scales, transform=transform
     )
 
     loader = DataLoader(

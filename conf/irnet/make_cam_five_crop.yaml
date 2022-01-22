@@ -1,0 +1,18 @@
+hydra:
+  run:
+    dir: ./results/pipeline/resnet50v2/irnet_five/make_cam/seg-model-224
+device: 'cuda:0'
+weights: ${hydra:runtime.cwd}/results/pipeline/resnet50v2/train/weights/seg-model-224.pt
+logs: ./logs
+voc12_root: ${hydra:runtime.cwd}/../vision/data/raw/VOCdevkit/VOC2012
+train_list: ${hydra:runtime.cwd}/voc12/train.txt
+cls_label_path: ${hydra:runtime.cwd}/voc12/cls_labels.npy
+num_classes: 20
+out_ch: 21
+backbone: resnet50v2
+output_dir: cam_outputs/
+in_channels: 2048
+crop_size: 512
+scales: 1.0-0.5-1.5-2.0
+dilate_version: 1
+num_workers: 4

@@ -54,7 +54,7 @@ def split_dataset(dataset, n_splits):
 
 
 if __name__ == "__main__":
-    max_step = (10510 // 16) * 3
+    max_step = (10510 // 16) * 10
 
     optimizer = PolyOptimizer(
         [{"params": dict(), "lr": 0.1, "weight_decay": 1e-4}],
