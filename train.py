@@ -1,6 +1,5 @@
 import logging
 import os
-from functools import partial
 from uuid import uuid4
 
 import hydra
@@ -275,7 +274,7 @@ def run_app(cfg: DictConfig) -> None:
         log_loss_summary(logger, float(val_cls_acc), epoch, tag=f"val_cls_acc")
         log_loss_summary(logger, float(val_cls_loss), epoch, tag=f"val_cls_loss")
         log_loss_summary(logger, float(val_seg_loss), epoch, tag=f"val_seg_loss")
-        if ((epoch + 1) % cfg.crf_freq == 0 and epoch != cfg.epochs - 1) or (
+        if ((epoch + 1) % cfg.crf_freq == 0 and (epoch + 1) > 5) or (
                 epoch + 1
         ) == 5:
             if crf_counter == cfg.crf_counter:
