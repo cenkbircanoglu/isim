@@ -19,14 +19,16 @@ def run_app(cfg: DictConfig) -> None:
     logger = Logger(cfg.logs)
     try:
         epoch = cfg.cam_out_dir.split("/")[-2].split("-")[-1]
-        print(epoch)
+        logging.info(epoch)
         epoch = int(epoch)
     except:
         epoch = cfg.last_epoch
     dataset = VOCSemanticSegmentationDataset(
         split=cfg.infer_set, data_dir=cfg.voc12_root
     )
-    labels = [dataset.get_example_by_keys(i, (1,))[0] for i in range(len(dataset))]
+    labels = [
+        dataset.get_example_by_keys(i, (1,))[0] for i in range(len(dataset))
+    ]
     for subdir in os.listdir(cfg.cam_out_dir):
         if subdir.startswith("."):
             continue
@@ -88,7 +90,9 @@ def run_app(cfg: DictConfig) -> None:
         results["miou_without_background"] = np.nanmean(iou[1:])
         logging.info(f"iou: {iou}\tmiou: {np.nanmean(iou)}\tFolder: {folder}")
         for key, value in results.items():
-            log_loss_summary(logger, value, epoch, tag=f"eval_{cfg.infer_set}_{key}")
+            log_loss_summary(
+                logger, value, epoch, tag=f"eval_{cfg.infer_set}_{key}"
+            )
 
 
 if __name__ == "__main__":

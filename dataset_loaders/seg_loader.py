@@ -1,5 +1,5 @@
 import os
-
+import logging
 from voc12 import dataloader
 from voc12.dataloader import TorchvisionNormalize
 
@@ -26,7 +26,7 @@ def data_loaders(cfg):
         temp_dir=cfg.temp_dir,
     )
     scales = [float(i) for i in str(cfg.scales).split("-")]
-    print("Scales", scales)
+    logging.info(f"Scales {str(scales)}")
     train_dataset = dataloader.VOC12ClassificationDatasetMSF(
         cfg.train_list, voc12_root=cfg.voc12_root, scales=scales
     )

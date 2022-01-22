@@ -3,6 +3,7 @@ import random
 
 import numpy as np
 import torch
+import wandb
 from skimage.color import label2rgb
 from sklearn.metrics import average_precision_score
 
@@ -17,6 +18,7 @@ def set_seed(seed):
 
 
 def log_loss_summary(logger, loss, step, tag):
+    wandb.log({tag: np.mean(loss)}, step=step)
     logger.scalar_summary(tag, np.mean(loss), step)
 
 

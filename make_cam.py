@@ -1,3 +1,4 @@
+import logging
 import os
 
 import hydra
@@ -13,8 +14,6 @@ from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
 from utils import set_seed
 from voc12 import dataloader
-
-set_seed(3407)
 
 
 def extract_valid_cams(cams, size, label, cfg, img_name):
@@ -39,7 +38,10 @@ def extract_valid_cams(cams, size, label, cfg, img_name):
 
         np.save(
             output_path,
-            {"keys": valid_cat.cpu().numpy(), "high_res": strided_cam.cpu().numpy()},
+            {
+                "keys": valid_cat.cpu().numpy(),
+                "high_res": strided_cam.cpu().numpy(),
+            },
         )
 
 
@@ -77,7 +79,7 @@ def run_app(cfg: DictConfig) -> None:
 
 def data_loaders(cfg):
     scales = [float(i) for i in str(cfg.scales).split("-")]
-    print("Scales", scales)
+    logging.info("Scales", scales)
     dataset = dataloader.VOC12ClassificationDatasetMSF(
         cfg.infer_list, voc12_root=cfg.voc12_root, scales=scales
     )
@@ -94,4 +96,5 @@ def data_loaders(cfg):
 
 
 if __name__ == "__main__":
+    set_seed(9)
     run_app()
