@@ -58,7 +58,9 @@ def run_app(cfg: DictConfig) -> None:
         for subdir in os.listdir(cfg.cam_out_dir):
             if subdir.startswith("."):
                 continue
-            folder = os.path.join(f"{cfg.cam_out_dir}-{epoch}/cam_outputs", subdir)
+            folder = os.path.join(
+                f"{cfg.cam_out_dir}-{epoch}/cam_outputs", subdir
+            )
             preds = []
             for id in tqdm(dataset.ids):
                 cam_dict = np.load(
