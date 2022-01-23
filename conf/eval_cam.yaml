@@ -10,6 +10,6 @@ cls_label_path: ${hydra:runtime.cwd}/voc12/cls_labels.npy
 cam_out_dir:
 cam_eval_thres: 0.15
 logs: ./logs
-last_epoch: 100
 crf_freq: 2
 crop_size: 512
+epochs:
