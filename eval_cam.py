@@ -3,6 +3,7 @@ import os
 
 import hydra
 import numpy as np
+import wandb
 from chainercv.datasets import VOCSemanticSegmentationDataset
 from chainercv.evaluations import calc_semantic_segmentation_confusion
 from omegaconf import DictConfig
@@ -16,6 +17,12 @@ set_seed(3407)
 
 @hydra.main(config_path="./conf/", config_name="eval_cam")
 def run_app(cfg: DictConfig) -> None:
+    run = wandb.init(
+        project=f"{cfg.wandb.project}",
+        name=cfg.wandb.name,
+        config=cfg.__dict__,
+        tags=["eval", "pipeline"],
+    )
     logger = Logger(cfg.logs)
     try:
         epoch = cfg.cam_out_dir.split("/")[-2].split("-")[-1]
