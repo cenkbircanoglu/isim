@@ -55,12 +55,11 @@ def run_app(cfg: DictConfig) -> None:
         dataset.get_example_by_keys(i, (1,))[0] for i in range(len(dataset))
     ]
     for iter, epoch in enumerate(epochs):
-        for subdir in os.listdir(cfg.cam_out_dir):
+        cam_out_dir = f"{cfg.cam_out_dir}{epoch}/cam_outputs"
+        for subdir in os.listdir(cam_out_dir):
             if subdir.startswith("."):
                 continue
-            folder = os.path.join(
-                f"{cfg.cam_out_dir}-{epoch}/cam_outputs", subdir
-            )
+            folder = os.path.join(cam_out_dir, subdir)
             preds = []
             for id in tqdm(dataset.ids):
                 cam_dict = np.load(

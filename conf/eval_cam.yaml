@@ -13,3 +13,4 @@ logs: ./logs
 crf_freq: 2
 crop_size: 512
 epochs:
+backbone:
