@@ -37,17 +37,40 @@ infer_experiment() {
         crop_size=${CROP_SIZE}
 }
 
+# Experiments on comparing the different iteration frequency
 
-# array=(4 5 7 9 11 13 15 17 19 21)
-# infer_experiment resnet50v2 512 2 array
-# array=(4 9 14 19 24 29 34 39 44 49)
-# infer_experiment resnet50v2 512 5 array
-#array=(4 9 19 29 39 49 59 69 79 89)
-#nfer_experiment resnet50v2 512 10 array
-#array=(4 24 49 74 99 124 149 174 199 224)
-#infer_experiment resnet50v2 512 25 array
-# array=(4 49 99 149 199 249 299 349 399 449)
-# infer_experiment resnet50v2 512 50 array
+# CRF_FREQ = 2
+array=(4 5 7 9 11 13 15 17 19 21)
+infer_experiment resnet50v2 512 2 array
 
+# CRF_FREQ = 5
+array=(4 9 14 19 24 29 34 39 44 49)
+infer_experiment resnet50v2 512 5 array
+
+# CRF_FREQ = 10
+array=(4 9 19 29 39 49 59 69 79 89)
+infer_experiment resnet50v2 512 10 array
+
+# CRF_FREQ = 25
 array=(4 24 49 74 99 124 149 174 199 224)
+infer_experiment resnet50v2 512 25 array
+
+# CRF_FREQ = 50
+array=(4 49 99 149 199 249 299 349 399 449)
+infer_experiment resnet50v2 512 50 array
+
+# Experiments on comparing the different network architectures
+
+# CRF_FREQ = 25 (as it gives the best mIoU and time-complexity)
+array=(4 24 49 74 99 124 149 174 199 224)
+
+# ResNet Variations
+infer_experiment resnet50v2 512 25 array
 infer_experiment resnet101v2 512 25 array
+infer_experiment resnet152v2 512 25 array
+
+# ResNeSt Variations
+infer_experiment resnest50 512 25 array
+infer_experiment resnest101 512 25 array
+infer_experiment resnest200 512 25 array
+infer_experiment resnest269 512 25 array

@@ -17,16 +17,20 @@ run_experiment() {
         epochs=1000
 }
 
-# run_experiment resnet50v2 512 48 2
-# run_experiment resnet50v2 512 48 5
-# run_experiment resnet50v2 512 48 10
-# run_experiment resnet50v2 512 48 25
-# run_experiment resnet50v2 512 48 50
+# Experiments on comparing the different iteration frequency
+run_experiment resnet50v2 512 48 2
+run_experiment resnet50v2 512 48 5
+run_experiment resnet50v2 512 48 10
+run_experiment resnet50v2 512 48 25
+run_experiment resnet50v2 512 48 50
 
+# Experiments on comparing the different network architectures
+run_experiment resnet50v2 512 48 25
 run_experiment resnet101v2 512 32 25
-# run_experiment resnet152v2 512 32 25
-# run_experiment resnest50 512 48 25
-# run_experiment resnest101 512 32 25
-# run_experiment resnest200 512 16 25
-# run_experiment resnest269 512 16 25
+run_experiment resnet152v2 512 32 25
+
+run_experiment resnest50 512 48 25
+run_experiment resnest101 512 32 25
+run_experiment resnest200 512 16 25
+run_experiment resnest269 512 16 25
 

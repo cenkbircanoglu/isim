@@ -16,4 +16,9 @@ make_cam_experiment() {
 
 make_cam_experiment resnet50v2 512 25
 make_cam_experiment resnet101v2 512 25
+make_cam_experiment resnet152v2 512 25
+make_cam_experiment resnest50 512 25
+make_cam_experiment resnest101 512 25
+make_cam_experiment resnest200 512 25
+make_cam_experiment resnest269 512 25
 
