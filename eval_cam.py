@@ -44,7 +44,7 @@ def run_app(cfg: DictConfig) -> None:
         project=f"{cfg.wandb.project}",
         name=cfg.wandb.name,
         config=cfg.__dict__,
-        tags=["eval", "pipeline"],
+        tags=["eval", "pipeline", str(cfg.infer_set), str(cfg.cam_eval_thres)],
     )
     logger = Logger(cfg.logs)
     epochs = cfg.epochs.split(",")
