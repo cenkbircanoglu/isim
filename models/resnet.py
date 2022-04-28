@@ -70,7 +70,9 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, layers, strides=(2, 2, 2, 2), dilations=(1, 1, 1, 1)):
+    def __init__(
+        self, block, layers, strides=(2, 2, 2, 2), dilations=(1, 1, 1, 1)
+    ):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(
@@ -164,4 +166,4 @@ def resnet152(pretrained=True, **kwargs):
 
 if __name__ == "__main__":
     model = resnet152(pretrained=True)
-    print(model)
+    logging.info(model)

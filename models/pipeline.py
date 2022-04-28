@@ -3,10 +3,10 @@ from enum import Enum
 import torch
 from torch import nn
 
-from models.resnet import resnet50
 from models.classifier import Classifier
 from models.decoder import Decoder
 from models.encoder import Encoder
+from models.resnet import resnet50
 
 
 class ModelMode(Enum):
@@ -20,13 +20,17 @@ class ProcessMode(Enum):
 
 
 class Pipeline(nn.Module):
-    def __init__(self, encoder_model, classifier_model, decoder_model, *args, **kwargs):
+    def __init__(
+        self, encoder_model, classifier_model, decoder_model, *args, **kwargs
+    ):
         super(Pipeline, self).__init__()
         self.encoder_model = encoder_model
         self.classifier_model = classifier_model
         self.decoder_model = decoder_model
 
-    def forward(self, x, model_mode=ModelMode.classification, mode=ProcessMode.train):
+    def forward(
+        self, x, model_mode=ModelMode.classification, mode=ProcessMode.train
+    ):
         assert model_mode is not None and mode is not None
         features = self.encoder_model(x)
         d = {"cls": None, "cams": None, "seg": None}

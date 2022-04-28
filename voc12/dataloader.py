@@ -74,7 +74,8 @@ def load_image_label_from_xml(img_name, voc12_root):
 
 def load_image_label_list_from_xml(img_name_list, voc12_root):
     return [
-        load_image_label_from_xml(img_name, voc12_root) for img_name in img_name_list
+        load_image_label_from_xml(img_name, voc12_root)
+        for img_name in img_name_list
     ]
 
 
@@ -290,7 +291,9 @@ class VOC12SegmentationDataset(Dataset):
             img, label = imutils.random_lr_flip((img, label))
 
         if self.crop_method == "random":
-            img, label = imutils.random_crop((img, label), self.crop_size, (0, 255))
+            img, label = imutils.random_crop(
+                (img, label), self.crop_size, (0, 255)
+            )
         else:
             img = imutils.top_left_crop(img, self.crop_size, 0)
             label = imutils.top_left_crop(label, self.crop_size, 255)
@@ -333,7 +336,10 @@ class VOC12PseudoSegmentationDataset(VOC12ClassificationDataset):
         keys = np.pad(keys + 1, (1, 0), mode="constant")
 
         fg_conf_cam = np.pad(
-            cams, ((1, 0), (0, 0), (0, 0)), mode="constant", constant_values=fg_thres
+            cams,
+            ((1, 0), (0, 0), (0, 0)),
+            mode="constant",
+            constant_values=fg_thres,
         )
         fg_conf_cam = np.argmax(fg_conf_cam, axis=0)
 

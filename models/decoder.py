@@ -20,13 +20,19 @@ class Decoder(nn.Module):
         elif dilate_version == 2:
             aspp_dilate = [12, 24, 36]
         else:
-            raise Exception({"message": f"Unknown Dilation Version {dilate_version}"})
+            raise Exception(
+                {"message": f"Unknown Dilation Version {dilate_version}"}
+            )
         inplanes = 2048
         low_level_planes = 256
         assert in_channels == inplanes
 
         self.classifier = DeepLabHeadV3Plus(
-            inplanes, low_level_planes, out_ch, aspp_dilate, input_shape=input_shape
+            inplanes,
+            low_level_planes,
+            out_ch,
+            aspp_dilate,
+            input_shape=input_shape,
         )
 
     def forward(self, features):
@@ -45,4 +51,6 @@ if __name__ == "__main__":
     features = {"x1": x1, "x2": x2, "x3": x3, "x4": x4, "x5": x5}
     y = model.forward(features)
     assert y.shape == (2, 21, 512, 512)
-    print(sum(p.numel() for p in model.parameters() if p.requires_grad))  # 16253813
+    logging.info(
+        sum(p.numel() for p in model.parameters() if p.requires_grad)
+    )  # 16253813

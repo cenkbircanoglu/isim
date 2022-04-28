@@ -15,7 +15,9 @@ class _SimpleSegmentationModel(nn.Module):
         input_shape = x.shape[-2:]
         features = self.backbone(x)
         x = self.classifier(features)
-        x = F.interpolate(x, size=input_shape, mode="bilinear", align_corners=False)
+        x = F.interpolate(
+            x, size=input_shape, mode="bilinear", align_corners=False
+        )
         return x
 
 
@@ -89,7 +91,9 @@ class DeepLabHeadV3Plus(nn.Module):
             mode="bilinear",
             align_corners=False,
         )
-        x = self.classifier(torch.cat([low_level_feature, output_feature], dim=1))
+        x = self.classifier(
+            torch.cat([low_level_feature, output_feature], dim=1)
+        )
         x = F.interpolate(
             x, size=self.input_shape, mode="bilinear", align_corners=False
         )
@@ -155,7 +159,12 @@ class AtrousSeparableConvolution(nn.Module):
             ),
             # PointWise Conv
             nn.Conv2d(
-                in_channels, out_channels, kernel_size=1, stride=1, padding=0, bias=bias
+                in_channels,
+                out_channels,
+                kernel_size=1,
+                stride=1,
+                padding=0,
+                bias=bias,
             ),
         )
 

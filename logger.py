@@ -17,15 +17,26 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def log_losses(
-    logger, step, phase, cls_losses_list, ap_scores, total_cnt, seg_losses_list=None
+    logger,
+    step,
+    phase,
+    cls_losses_list,
+    ap_scores,
+    total_cnt,
+    seg_losses_list=None,
 ):
-    log_loss_summary(logger, cls_losses_list[0], step, tag=f"{phase}_total_cls_loss")
+    log_loss_summary(
+        logger, cls_losses_list[0], step, tag=f"{phase}_total_cls_loss"
+    )
     for idx, tr_loss in enumerate(cls_losses_list):
         if idx == 0:
             continue
         if sum(cls_losses_list[idx]) != 0:
             log_loss_summary(
-                logger, cls_losses_list[idx], step, tag=f"{phase}_block{idx}_cls_loss"
+                logger,
+                cls_losses_list[idx],
+                step,
+                tag=f"{phase}_block{idx}_cls_loss",
             )
 
     if seg_losses_list is not None:
@@ -43,7 +54,9 @@ def log_losses(
                     tag=f"{phase}_block{idx}_seg_loss",
                 )
 
-    log_loss_summary(logger, float(ap_scores[0]) / total_cnt, step, tag=f"{phase}_mAP")
+    log_loss_summary(
+        logger, float(ap_scores[0]) / total_cnt, step, tag=f"{phase}_mAP"
+    )
     for idx, ap_score in enumerate(ap_scores):
         if idx == 0:
             continue

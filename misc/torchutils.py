@@ -49,7 +49,8 @@ class PolyOptimizer(torch.optim.SGD):
 
 def split_dataset(dataset, n_splits):
     return [
-        Subset(dataset, np.arange(i, len(dataset), n_splits)) for i in range(n_splits)
+        Subset(dataset, np.arange(i, len(dataset), n_splits))
+        for i in range(n_splits)
     ]
 
 
@@ -62,6 +63,6 @@ if __name__ == "__main__":
         weight_decay=1e-4,
         max_step=max_step,
     )
-    print(max_step)
+    logging.info(max_step)
     for i in range(max_step):
         optimizer.step()

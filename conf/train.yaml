@@ -1,6 +1,9 @@
 hydra:
   run:
     dir: ./results/train-pipeline/${name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+wandb:
+  project: isim
+  name: ${backbone}-crf-${crf_freq}-img-size-${crop_size}
 batch_size: 32
 epochs: 250
 lr: 0.1
@@ -28,3 +31,4 @@ iter_count: 0
 max_step: 5
 scales: 1.0-0.5-1.5-2.0
 dilate_version: 1
+crf_counter: 10

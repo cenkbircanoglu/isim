@@ -1,3 +1,4 @@
+import logging
 import os
 
 import hydra
@@ -11,7 +12,6 @@ from tqdm import tqdm
 from misc import imutils
 from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
-
 from utils import set_seed
 from voc12 import dataloader
 
@@ -24,7 +24,10 @@ def extract_valid_cams(outputs, size, label, cfg, img_name):
 
     strided_cams_list = [
         F.interpolate(
-            torch.unsqueeze(o, 0), strided_size, mode="bilinear", align_corners=False
+            torch.unsqueeze(o, 0),
+            strided_size,
+            mode="bilinear",
+            align_corners=False,
         )[0]
         for o in outputs
     ]
@@ -32,11 +35,16 @@ def extract_valid_cams(outputs, size, label, cfg, img_name):
 
     highres_cam = [
         F.interpolate(
-            torch.unsqueeze(o, 1), strided_up_size, mode="bilinear", align_corners=False
+            torch.unsqueeze(o, 1),
+            strided_up_size,
+            mode="bilinear",
+            align_corners=False,
         )
         for o in outputs
     ]
-    highres_cam = torch.sum(torch.stack(highres_cam, 0), 0)[:, 0, : size[0], : size[1]]
+    highres_cam = torch.sum(torch.stack(highres_cam, 0), 0)[
+        :, 0, : size[0], : size[1]
+    ]
 
     keys = torch.nonzero(label, as_tuple=False)[:, 0]
 
@@ -50,7 +58,11 @@ def extract_valid_cams(outputs, size, label, cfg, img_name):
     keys = np.pad(keys.cpu() + 1, (1, 0), mode="constant")
     np.save(
         os.path.join(output_folder, img_name + ".npy"),
-        {"keys": keys, "cam": strided_cams.cpu(), "hr_cam": highres_cam.cpu().numpy()},
+        {
+            "keys": keys,
+            "cam": strided_cams.cpu(),
+            "hr_cam": highres_cam.cpu().numpy(),
+        },
     )
 
 
@@ -86,7 +98,7 @@ def run_app(cfg: DictConfig) -> None:
 
 def data_loaders(cfg):
     scales = [float(i) for i in str(cfg.scales).split("-")]
-    print("Scales", scales)
+    logging.info(f"Scales {str(scales)}")
     dataset = dataloader.VOC12ClassificationDatasetMSF(
         cfg.train_list, voc12_root=cfg.voc12_root, scales=scales
     )

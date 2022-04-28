@@ -1,3 +1,4 @@
+import logging
 from functools import partial
 from multiprocessing import Pool
 
@@ -64,48 +65,52 @@ def calculate_crf(
 ):
     model.eval()
     tr_results = []
-    val_results = []
+    # val_results = []
 
     with torch.set_grad_enabled(False):
-        print("\nCreating Pseudo Labels for training")
+        logging.info("\nCreating Pseudo Labels for training")
         for item in tqdm(tr_loader, total=len(tr_loader.dataset)):
             idx = item["idx"][0]
             img_i = [img_ii.to(device) for img_ii in item["img"]]
-            res = generate_pseudo_label(model, img_i, item["label"][0], item["size"])
+            res = generate_pseudo_label(
+                model, img_i, item["label"][0], item["size"]
+            )
             tr_results.append((idx.cpu().item(), res))
             if len(tr_results) >= crf_batch_size:
                 with Pool(processes=4) as pool:
                     pool.starmap(
-                        partial(dataset_train.update_cam, fg_thres=cfg.cam_eval_thres),
+                        partial(
+                            dataset_train.update_cam, fg_thres=cfg.cam_eval_thres
+                        ),
                         tqdm(tr_results, total=len(tr_results)),
                     )
                 tr_results = []
-        print("\nCreating Pseudo Labels for validation")
-        for item in tqdm(val_loader, total=len(val_loader.dataset)):
-            idx = item["idx"][0]
-            img_i = [img_ii.to(device) for img_ii in item["img"]]
-            res = generate_pseudo_label(model, img_i, item["label"][0], item["size"])
-            val_results.append((idx.cpu().item(), res))
-            if len(val_results) >= crf_batch_size:
-                with Pool(processes=4) as pool:
-                    pool.starmap(
-                        partial(dataset_valid.update_cam, fg_thres=cfg.cam_eval_thres),
-                        tqdm(val_results, total=len(val_results)),
-                    )
-                val_results = []
-    print("Applying CRF to CAM results")
+        # print("\nCreating Pseudo Labels for validation")
+        # for item in tqdm(val_loader, total=len(val_loader.dataset)):
+        #     idx = item["idx"][0]
+        #     img_i = [img_ii.to(device) for img_ii in item["img"]]
+        #     res = generate_pseudo_label(model, img_i, item["label"][0], item["size"])
+        #     val_results.append((idx.cpu().item(), res))
+        #     if len(val_results) >= crf_batch_size:
+        #         with Pool(processes=4) as pool:
+        #             pool.starmap(
+        #                 partial(dataset_valid.update_cam, fg_thres=cfg.cam_eval_thres),
+        #                 tqdm(val_results, total=len(val_results)),
+        #             )
+        #         val_results = []
+    logging.info("Applying CRF to CAM results")
     if len(tr_results) > 0:
-        with Pool(processes=4) as pool:
+        with Pool(processes=8) as pool:
             pool.starmap(
                 partial(dataset_train.update_cam, fg_thres=cfg.cam_eval_thres),
                 tqdm(tr_results, total=len(tr_results)),
             )
-    if len(val_results) > 0:
-        with Pool(processes=4) as pool:
-            pool.starmap(
-                partial(dataset_valid.update_cam, fg_thres=cfg.cam_eval_thres),
-                tqdm(val_results, total=len(val_results)),
-            )
+    # if len(val_results) > 0:
+    #     with Pool(processes=4) as pool:
+    #         pool.starmap(
+    #             partial(dataset_valid.update_cam, fg_thres=cfg.cam_eval_thres),
+    #             tqdm(val_results, total=len(val_results)),
+    #         )
 
     loader_train = DataLoader(
         dataset_train,

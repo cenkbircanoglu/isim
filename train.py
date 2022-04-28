@@ -1,8 +1,11 @@
+import logging
 import os
+from uuid import uuid4
 
 import hydra
 import numpy as np
 import torch
+import wandb
 from PIL import Image
 from chainercv.evaluations import calc_semantic_segmentation_confusion
 from omegaconf import DictConfig
@@ -18,11 +21,10 @@ from models import initialize_model
 from models.pipeline import ModelMode, ProcessMode
 from utils import get_ap_score, makedirs, log_images, log_loss_summary, set_seed
 
-set_seed(3407)
-torch.backends.cudnn.benchmark = True
 
-
-def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch):
+def train_pipeline_one_epoch(
+    model, dataset_loader, optimizer, epoch, scaler=None
+):
     model.train()
     total_cnt = total_cls_loss = total_seg_loss = total_ap_score = 0.0
     for i, batch in tqdm(
@@ -37,23 +39,31 @@ def train_pipeline_one_epoch(model, dataset_loader, optimizer, epoch):
         )
         batch_size = cls_label.size(0)
         total_cnt += batch_size
-
-        with torch.set_grad_enabled(True):
-            d = model(img, model_mode=ModelMode.segmentation, mode=ProcessMode.train)
-            cls_logits, seg_logits = d["cls"], d["seg"]
-            cls_loss = mlsm_loss(cls_logits, cls_label)
-            seg_loss = modified_cross_entropy_loss(seg_logits, seg_label)
-            total_cls_loss += cls_loss.item()
-            total_seg_loss += seg_loss.item()
-            loss = cls_loss + seg_loss
+        with torch.cuda.amp.autocast(enabled=scaler is not None):
+            with torch.set_grad_enabled(True):
+                d = model(
+                    img,
+                    model_mode=ModelMode.segmentation,
+                    mode=ProcessMode.train,
+                )
+                cls_logits, seg_logits = d["cls"], d["seg"]
+                cls_loss = mlsm_loss(cls_logits, cls_label)
+                seg_loss = modified_cross_entropy_loss(seg_logits, seg_label)
+                total_cls_loss += cls_loss.item()
+                total_seg_loss += seg_loss.item()
+                loss = cls_loss + seg_loss
         with torch.set_grad_enabled(False):
             total_ap_score += get_ap_score(
                 cls_label.cpu().detach().numpy(),
                 torch.sigmoid(cls_logits).cpu().detach().numpy(),
             )
-
-        loss.backward()
-        optimizer.step(epoch=epoch)
+        if scaler is not None:
+            scaler.scale(loss).backward()
+            scaler.step(optimizer, epoch=epoch)
+            scaler.update()
+        else:
+            loss.backward()
+            optimizer.step(epoch=epoch)
     avg_cls_acc, avg_cls_loss, avg_seg_loss = (
         total_ap_score / total_cnt,
         total_cls_loss / total_cnt,
@@ -78,7 +88,9 @@ def eval_pipeline_one_epoch(model, dataset_loader, epoch, logger, cfg):
             batch_size = cls_label.size(0)
             total_cnt += batch_size
 
-            d = model(img, model_mode=ModelMode.segmentation, mode=ProcessMode.train)
+            d = model(
+                img, model_mode=ModelMode.segmentation, mode=ProcessMode.train
+            )
             cls_logits, seg_logits = d["cls"], d["seg"]
             cls_loss = mlsm_loss(cls_logits, cls_label)
             seg_loss = modified_cross_entropy_loss(seg_logits, seg_label)
@@ -92,7 +104,9 @@ def eval_pipeline_one_epoch(model, dataset_loader, epoch, logger, cfg):
                 tag = "image/{}".format(i)
                 num_images = cfg.vis_images - i * cfg.batch_size
                 logger.image_list_summary(
-                    tag, log_images(img, seg_label, seg_logits)[:num_images], epoch
+                    tag,
+                    log_images(img, seg_label, seg_logits)[:num_images],
+                    epoch,
                 )
     avg_cls_acc, avg_cls_loss, avg_seg_loss = (
         total_ap_score / total_cnt,
@@ -102,7 +116,7 @@ def eval_pipeline_one_epoch(model, dataset_loader, epoch, logger, cfg):
     return avg_cls_acc, avg_cls_loss, avg_seg_loss
 
 
-def calculate_segmentation_metric(dataset, data_type="train"):
+def calculate_segmentation_metric(dataset, epoch, data_type="train"):
     preds = []
     labels = []
 
@@ -153,11 +167,18 @@ def calculate_segmentation_metric(dataset, data_type="train"):
         )
     )
     print(results, f"miou: {np.nanmean(iou)}", data_type)
+    wandb.log(results, step=epoch)
     return float(np.nanmean(iou))
 
 
 @hydra.main(config_path="./conf/", config_name="train")
 def run_app(cfg: DictConfig) -> None:
+    run = wandb.init(
+        project=f"{cfg.wandb.project}",
+        name=cfg.wandb.name,
+        config=cfg.__dict__,
+        tags=["train", "pipeline"],
+    )
     makedirs(cfg)
     (
         dataset_train,
@@ -169,6 +190,7 @@ def run_app(cfg: DictConfig) -> None:
     model = initialize_model(cfg)
     param_groups = model.trainable_parameters()
     model = torch.nn.DataParallel(model).cuda()
+    wandb.watch(model)
     tr_loader = DataLoader(
         tr_data_scaled,
         shuffle=False,
@@ -209,31 +231,41 @@ def run_app(cfg: DictConfig) -> None:
 
     optimizer = torchutils.PolyOptimizer(
         [
-            {"params": param_groups[0], "lr": cfg.lr, "weight_decay": cfg.weight_decay},
+            {
+                "params": param_groups[0],
+                "lr": cfg.lr,
+                "weight_decay": cfg.weight_decay,
+            },
             {
                 "params": param_groups[1],
                 "lr": 10 * cfg.lr,
                 "weight_decay": cfg.weight_decay,
             },
-            {"params": param_groups[2], "lr": cfg.lr, "weight_decay": cfg.weight_decay},
+            {
+                "params": param_groups[2],
+                "lr": cfg.lr,
+                "weight_decay": cfg.weight_decay,
+            },
         ],
         lr=cfg.lr,
         weight_decay=cfg.weight_decay,
         max_step=max_step,
         logger=logger,
     )
-
+    scaler = torch.cuda.amp.GradScaler()
     crf_counter = 0
     for epoch in tqdm(range(cfg.epochs), total=cfg.epochs):
 
         if epoch == 0:
-            miou = calculate_segmentation_metric(loader_valid.dataset, "val")
+            miou = calculate_segmentation_metric(
+                loader_valid.dataset, epoch, data_type="train"
+            )
             log_loss_summary(logger, miou, epoch, tag=f"val_miou")
 
         model, tr_cls_acc, tr_cls_loss, tr_seg_loss = train_pipeline_one_epoch(
-            model, loader_train, optimizer, epoch
+            model, loader_train, optimizer, epoch, scaler
         )
-        print(
+        logging.info(
             f"\nEpoch: {epoch}\tData: Train\tAverage Cls Acc: {tr_cls_acc}\tAverage Cls Loss: {tr_cls_loss}\tAverage Seg Loss {tr_seg_loss}\n"
         )
         log_loss_summary(logger, float(tr_cls_acc), epoch, tag=f"tr_cls_acc")
@@ -242,44 +274,61 @@ def run_app(cfg: DictConfig) -> None:
         val_cls_acc, val_cls_loss, val_seg_loss = eval_pipeline_one_epoch(
             model, loader_valid, epoch, logger, cfg
         )
-        print(
+        logging.info(
             f"\nEpoch: {epoch}\tData: Val\tAverage Cls Acc: {val_cls_acc}\tAverage Cls Loss: {val_cls_loss}\tAverage Seg Loss {val_seg_loss}\n"
         )
         log_loss_summary(logger, float(val_cls_acc), epoch, tag=f"val_cls_acc")
         log_loss_summary(logger, float(val_cls_loss), epoch, tag=f"val_cls_loss")
         log_loss_summary(logger, float(val_seg_loss), epoch, tag=f"val_seg_loss")
-        crf_counter += 1
-
-        if cfg.crf_freq > 0:
-            if (
-                crf_counter % cfg.crf_freq == 0 and epoch != cfg.epochs - 1
-            ) or crf_counter == 5:
-                torch.save(
-                    model.module.state_dict(),
-                    os.path.join(cfg.weights, f"seg-model-{epoch}.pt"),
+        if ((epoch + 1) % cfg.crf_freq == 0 and (epoch + 1) > 5) or (
+            epoch + 1
+        ) == 5:
+            if crf_counter == cfg.crf_counter:
+                logging.info(
+                    f"Stopping the training as it reached the crf_counter: {cfg.crf_counter}, {crf_counter}"
                 )
-                print(
-                    f"Regenerating the segmentation labels! crf counter: {crf_counter} and freq: {cfg.crf_freq}"
-                )
-                loaders = calculate_crf(
-                    model.module,
-                    cfg,
-                    tr_loader,
-                    val_loader,
-                    dataset_train,
-                    dataset_valid,
-                    "cuda",
-                )
-                loader_train = loaders["train"]
-                loader_valid = loaders["valid"]
-                miou = calculate_segmentation_metric(loader_valid.dataset, "val")
-                log_loss_summary(logger, miou, epoch, tag=f"val_miou")
-
+                break
+            torch.save(
+                model.module.state_dict(),
+                os.path.join(cfg.weights, f"seg-model-{epoch}.pth"),
+            )
+            logging.info(
+                f"Regenerating the segmentation labels! crf counter: {crf_counter} and freq: {cfg.crf_freq}"
+            )
+            loaders = calculate_crf(
+                model.module,
+                cfg,
+                tr_loader,
+                val_loader,
+                dataset_train,
+                dataset_valid,
+                "cuda",
+            )
+            loader_train = loaders["train"]
+            loader_valid = loaders["valid"]
+            miou = calculate_segmentation_metric(
+                loader_valid.dataset, epoch, data_type="train"
+            )
+            log_loss_summary(logger, miou, epoch, tag=f"train_miou")
+            crf_counter += 1
+            log_loss_summary(logger, crf_counter, epoch, tag=f"crf_counter")
         torch.save(
-            model.module.state_dict(), os.path.join(cfg.weights, "final-model.pt")
+            model.module.state_dict(),
+            os.path.join(cfg.weights, "final-model.pth"),
         )
-    print("Training Finished")
+    logging.info("Training Finished")
+    artifact = wandb.Artifact(str(uuid4()), type="model")
+    artifact.add_file(os.path.join(cfg.weights, "final-model.pth"))
+    run.log_artifact(artifact)
+    logging.info("Artifacts Saved")
+    run.finish()
+    logging.info("Run Finished")
 
 
 if __name__ == "__main__":
+    set_seed(9)
+    torch.backends.cudnn.benchmark = True
+    torch.autograd.profiler.profile(False)
+    torch.autograd.set_detect_anomaly(False)
+    torch.autograd.profiler.profile(False)
     run_app()

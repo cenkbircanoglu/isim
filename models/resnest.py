@@ -16,9 +16,7 @@ from models.splat import SplAtConv2d
 
 __all__ = ["resnest50", "resnest101", "resnest200", "resnest269"]
 
-_url_format = (
-    "https://github.com/zhanghang1989/ResNeSt/releases/download/weights_step1/{}-{}.pth"
-)
+_url_format = "https://github.com/zhanghang1989/ResNeSt/releases/download/weights_step1/{}-{}.pth"
 
 
 class DropBlock2D(object):
@@ -32,7 +30,9 @@ class GlobalAvgPool2d(nn.Module):
         super(GlobalAvgPool2d, self).__init__()
 
     def forward(self, inputs):
-        return nn.functional.adaptive_avg_pool2d(inputs, 1).view(inputs.size(0), -1)
+        return nn.functional.adaptive_avg_pool2d(inputs, 1).view(
+            inputs.size(0), -1
+        )
 
 
 class Bottleneck(nn.Module):
@@ -123,7 +123,9 @@ class Bottleneck(nn.Module):
             )
             self.bn2 = norm_layer(group_width)
 
-        self.conv3 = nn.Conv2d(group_width, planes * 4, kernel_size=1, bias=False)
+        self.conv3 = nn.Conv2d(
+            group_width, planes * 4, kernel_size=1, bias=False
+        )
         self.bn3 = norm_layer(planes * 4)
 
         if last_gamma:
@@ -276,7 +278,13 @@ class ResNet(nn.Module):
             )
         else:
             self.conv1 = conv_layer(
-                3, 64, kernel_size=7, stride=2, padding=3, bias=False, **conv_kwargs
+                3,
+                64,
+                kernel_size=7,
+                stride=2,
+                padding=3,
+                bias=False,
+                **conv_kwargs
             )
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
@@ -521,7 +529,8 @@ def short_hash(name):
 
 
 resnest_model_urls = {
-    name: _url_format.format(name, short_hash(name)) for name in _model_sha256.keys()
+    name: _url_format.format(name, short_hash(name))
+    for name in _model_sha256.keys()
 }
 
 

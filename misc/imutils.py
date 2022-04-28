@@ -47,7 +47,9 @@ def random_resize_long(imgs, min_long, max_long):
 
 
 def random_scale(img, scale_range, order):
-    target_scale = scale_range[0] + random.random() * (scale_range[1] - scale_range[0])
+    target_scale = scale_range[0] + random.random() * (
+        scale_range[1] - scale_range[0]
+    )
 
     if isinstance(img, tuple):
         return (
@@ -119,7 +121,9 @@ def random_crop(images, cropsize, default_values):
             cont = np.ones((cropsize, cropsize, img.shape[2]), img.dtype) * f
         else:
             cont = np.ones((cropsize, cropsize), img.dtype) * f
-        cont[box[0] : box[1], box[2] : box[3]] = img[box[4] : box[5], box[6] : box[7]]
+        cont[box[0] : box[1], box[2] : box[3]] = img[
+            box[4] : box[5], box[6] : box[7]
+        ]
         new_images.append(cont)
 
     if len(new_images) == 1:
@@ -138,7 +142,8 @@ def top_left_crop(img, cropsize, default_value):
         container = np.ones((cropsize, cropsize), img.dtype) * default_value
     else:
         container = (
-            np.ones((cropsize, cropsize, img.shape[2]), img.dtype) * default_value
+            np.ones((cropsize, cropsize, img.shape[2]), img.dtype)
+            * default_value
         )
 
     container[:ch, :cw] = img[:ch, :cw]
@@ -173,7 +178,8 @@ def center_crop(img, cropsize, default_value=0):
         container = np.ones((cropsize, cropsize), img.dtype) * default_value
     else:
         container = (
-            np.ones((cropsize, cropsize, img.shape[2]), img.dtype) * default_value
+            np.ones((cropsize, cropsize, img.shape[2]), img.dtype)
+            * default_value
         )
 
     container[cont_top : cont_top + ch, cont_left : cont_left + cw] = img[
@@ -192,7 +198,9 @@ def crf_inference_label(img, labels, t=10, n_labels=21, gt_prob=0.7):
 
     d = dcrf.DenseCRF2D(w, h, n_labels)
 
-    unary = unary_from_labels(labels, n_labels, gt_prob=gt_prob, zero_unsure=False)
+    unary = unary_from_labels(
+        labels, n_labels, gt_prob=gt_prob, zero_unsure=False
+    )
 
     d.setUnaryEnergy(unary)
     d.addPairwiseGaussian(sxy=3, compat=3)
@@ -355,9 +363,15 @@ def colorize_label(
             + np.sum(np.abs(test[:-1, :-1] - test[:-1, 1:]), axis=-1),
             0,
         )
-        edge1 = np.pad(edge, ((0, 1), (0, 1)), mode="constant", constant_values=0)
-        edge2 = np.pad(edge, ((1, 0), (1, 0)), mode="constant", constant_values=0)
-        edge = np.repeat(np.expand_dims(np.maximum(edge1, edge2), -1), 3, axis=-1)
+        edge1 = np.pad(
+            edge, ((0, 1), (0, 1)), mode="constant", constant_values=0
+        )
+        edge2 = np.pad(
+            edge, ((1, 0), (1, 0)), mode="constant", constant_values=0
+        )
+        edge = np.repeat(
+            np.expand_dims(np.maximum(edge1, edge2), -1), 3, axis=-1
+        )
 
         test = np.maximum(test, edge)
     return test
