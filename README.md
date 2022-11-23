@@ -1,25 +1,15 @@
-[![CodeQL](https://github.com/cenkbircanoglu/isim/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/cenkbircanoglu/isim/actions/workflows/codeql-analysis.yml)
-
-[![pages-build-deployment](https://github.com/cenkbircanoglu/isim/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages)](https://github.com/cenkbircanoglu/isim/actions/workflows/pages/pages-build-deployment)
-
-
-[![PWC]()]()
-[![PWC]()]()
 
 # ISIM
 The official implementation of "ISIM: Iterative Self-Improved Model for Weakly Supervised Segmentation".
 
 ## Citation
-- In Review for - 
-- Please cite our paper if the code is helpful to your research. [arxiv]()
-```
-```
 
-## Abstract
-TODO
+- In Review for [IJCV](https://www.springer.com/journal/11263/)
+- Please cite our paper if the code is helpful to your research. [arxiv](https://arxiv.org/abs/2211.12455)
+
 
 ## Overview
-![Overall architecture]()
+![Overall architecture](./resources/pipeline.png)
 
 <br>
 
@@ -27,7 +17,7 @@ TODO
 - Python 3.7.11, PyTorch 1.7.0, and more in requirements.txt
 - pydensecrf
 - CUDA 11.5
-- RTX 3090 GPU
+- RTX 3090 GPU, RTX 2080 GPU (x4)
 
 # Usage
 
@@ -40,55 +30,51 @@ pip install git+https://github.com/lucasb-eyer/pydensecrf.git
 ## Download PASCAL VOC 2012 devkit
 Follow instructions in http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit
 
-## 1. Train an image classifier for generating CAMs
+## 1. Run the experiments
 ```bash
-python -m train_cam hydra.run.dir=results/
+./scripts/experiments.sh
 ```
 
-## 2. Generate CAMs
+## 2. Get prediction results for the trained models
 ```bash
-python -m cam.make_cam hydra.run.dir=results/ weights=$(pwd)/results/weights/final-model.pt
+./scripts/infer_experiments.sh
 ```
 
-## 3. Evaluate the models
+## 3. Evaluate the predictions
 ```bash
-python -m cam.eval_cam hydra.run.dir=results/ cam_out_dir=$(pwd)/results/cam_outputs/
+./scripts/eval_experiments.sh
 ```
 
 ## 5. Results
-Qualitative segmentation results on the PASCAL VOC 2012 validation set. 
-Top: original images. Middle: ground truth. Bottom: prediction of the segmentation model trained using the pseudo-labels from ISIM.
-![Overall architecture]()
 
-| Methods | mIoU |
-|---|---:|
-| ISIM with ResNet-101 | TODO |
-| ISIM with ResNeSt-200 | TODO |
+| Methods | val mIoU | test mIoU |
+|---|---|-------:|
+| ISIM with ResNet-101 | [70.51](http://host.robots.ox.ac.uk:8080/anonymous/EGU15D.html) | [71.45](http://host.robots.ox.ac.uk:8080/anonymous/YG2SXH.html) |
+| ISIM with ResNeSt-200 |  [74.90](http://host.robots.ox.ac.uk:8080/anonymous/BYTTBW.html) | [74.98](http://host.robots.ox.ac.uk:8080/anonymous/XUU3KG.html) |
+
+Qualitative segmentation results on the PASCAL VOC 2012 validation set.
+
+![Qualitative Results](./resources/cams.png)
 
 ## 6. Provide the trained weights and training logs
 
-- TODO
-[experiments.zip]()
-
-- Release the final masks by our models. 
+- Release the final masks by our models. (SOON)
 
 | Model                  | val | test |
 |:----------------------:|:---:|:----:|
 | DeepLabv3+ ResNet-101 | [val.tgz]() | [test.tgz]() |
 | DeepLabv3+ ResNeSt-200 | [val.tgz]() | [test.tgz]() |
 
-
-### Quick Experiment on PASCAL VOC 2012 with ResNet50 backbone
-
-```bash
-sh scripts/run.sh
-```
-
-| background | aeroplane | bicycle | bird | boat | bottle | bus | car | cat | chair | cow | diningtable | dog | horse | motorbike | person | pottedplant | sheep | sofa | train | tvmonitor | mIoU |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 0.8316 | 0.50373 | 0.3227 | 0.5934  | 0.3601 | 0.5890 | 0.6572 | 0.5765 | 0.6845 | 0.2839 | 0.5924 | 0.4507 | 0.5850 | 0.6190 | 0.6776 | 0.6606 | 0.4663 | 0.6561 | 0.5252 | 0.4804 | 0.5352 | 0.5548 |
-
 <br>
 
 For any issues, please contact <b>Cenk Bircanoglu</b>, cenk.bircanoglu@gmail.com
 
+## 7. Notes
+
+- In MID-2021, Project started. 
+- 15 Nov 2021, [paper](./resources/VISI-D-21-00725.pdf) submitted to [IJCV](https://www.springer.com/journal/11263/).
+- On 21 January 2022, Got a refusal from [IJCV](https://www.springer.com/journal/11263/). 
+- On 25 January 2022, Cenk Bircanoglu got the Covid-19 Vaccine and had severe health problems.
+- On 20 November 2022, Health issues were relatively possible to manage, and we decided to continue this project.
+- On 21 November 2022, Found out [RecurSeed and EdgePredictMix](https://arxiv.org/abs/2204.06754v3). A similar idea (honestly, with a lot of improvements) has already been published.
+- On 23 November 2022, Decided to put the paper to [arxiv](https://arxiv.org/abs/2211.12455), share the code, note the project in history, and start from scratch with a new idea.
