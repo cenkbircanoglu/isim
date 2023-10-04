@@ -4,7 +4,7 @@ torchvision==0.11.1
 torchsummary==1.5.1
 tqdm==4.62.3
 hydra-core==1.1.1
-scipy==1.2.1
+scipy==1.10.0
 imageio==2.10.1
 scikit-image==0.18.3
 scikit-learn==1.0.1
